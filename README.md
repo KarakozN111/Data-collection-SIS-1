@@ -48,7 +48,7 @@ pip install requests pandas beautifulsoup4 matplotlib seaborn scipy python-doten
 
 ## Method
 
-### Part 1 – Web scraping
+### Part 1- Web scraping
 - Checks `robots.txt` with `RobotFileParser` before scraping; the page is downloaded with a single request.
 - Removes footnote markers like `[1]`.
 - `read_table()` handles cells merged with `rowspan`, so columns don't shift.
@@ -56,21 +56,21 @@ pip install requests pandas beautifulsoup4 matplotlib seaborn scipy python-doten
 - Each annual row (actor + actress) is split into two rows. Rows are marked `per_film` or `annual` in the `Type` column.
 - `money_to_number()` turns text like `"$75 million"` or `"$30,000,000"` into numbers.
 
-### Part 2 – TMDB API
+### Part 2- TMDB API
 - `tmdb_get()` retries up to 3 times on network errors and on status 429 (rate limit).
 - Actors are matched by name, preferring results with `known_for_department == "Acting"`. Wikipedia and TMDB names are shown side by side to check the match.
 - Roles are filtered out if they are voice roles, cameos, uncredited, self or archive footage; documentaries and animation; cast order 10 or lower in billing; unreleased or with no votes.
 - Film details are cached so the same film is never requested twice.
 - Final filter: only released films with rating, votes and box office above 0.
 
-### Part 3 – Cleaning and merging
+### Part 3- Cleaning and merging
 - Removes 8 pay rows where the actress was `N/a` with no pay.
 - Keeps films with box office of at least $100,000 and at least 50 votes, to remove incomplete TMDB records.
 - Converts pay and box office to millions (`Pay_m`, `Box_Office_m`).
 - `actor_summary.csv` – one row per actor: number of films, average rating, average and median box office, number of pay records, average and maximum pay.
 - `film_pay.csv` – per-film pay joined with the same film's data by actor and title. Titles written differently in the two sources were fixed manually (e.g. *Mission: Impossible 2* → *Mission: Impossible II*, *Pushpa 2: The Rule* → *Pushpa 2 - The Rule*); films missing from the TMDB table stay unmatched.
 
-### Part 4 – Analysis
+### Part 4- Analysis
 - Pay is measured as `Avg_Pay_m` – the actor's average pay over all their Wikipedia records.
 - Descriptive statistics (min, max, mean, median, std, range) and the actors with the highest and lowest values.
 - Pearson correlation matrix of all numeric columns.
@@ -88,17 +88,4 @@ pip install requests pandas beautifulsoup4 matplotlib seaborn scipy python-doten
 | `graph2_pay_vs_box_office.png` | Scatter plot: pay vs average box office, with trend line |
 | `graph3_top10_pay.png` | Bar chart: top 10 actors by average pay |
 
-## Limitations
 
-- The sample is small – only actors who appear in the Wikipedia lists – so correlation results should be read with care.
-- Wikipedia mixes two kinds of pay (one film vs a whole year), and these are averaged together in `Avg_Pay_m`.
-- Box office is not adjusted for inflation, and TMDB revenue data can be incomplete, especially for older and non-Hollywood films.
-- Actor matching by name can pick the wrong person when names are shared; the name comparison in cell 2.5 should be checked.
-- Correlation does not show causation.
-
-## Ethics
-
-- `robots.txt` was checked, and only one request was sent to Wikipedia.
-- Requests carry a User-Agent with contact information.
-- The API key is never written in the notebook.
-- The TMDB API is used under its terms of use. *This product uses the TMDB API but is not endorsed or certified by TMDB.*
